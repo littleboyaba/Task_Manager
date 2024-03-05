@@ -92,7 +92,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     keyboardType: TextInputType.text,
                     decoration: const InputDecoration(hintText: "Password"),
                     validator: (String? value) {
-                      if (value?.isEmpty ?? true) {
+                      if (value?.trim().isEmpty ?? true) {
                         return "Enter Your Password";
                       }
                       if (value!.length <= 6) {

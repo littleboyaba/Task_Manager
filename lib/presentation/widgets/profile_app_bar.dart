@@ -10,10 +10,16 @@ PreferredSizeWidget get profileAppBar {
     automaticallyImplyLeading: false,
     title: GestureDetector(
       onTap: () {
-        Navigator.push(
+        if (ModalRoute.of(TaskManager.navigatorKey.currentState!.context)?.settings.name != UpdateProfileScreen.routeName) {
+          Navigator.pushNamed(
             TaskManager.navigatorKey.currentState!.context,
-            MaterialPageRoute(
-                builder: (context) => const UpdateProfileScreen()));
+            UpdateProfileScreen.routeName,
+          );
+        }
+        // Navigator.push(
+        //     TaskManager.navigatorKey.currentState!.context,
+        //     MaterialPageRoute(
+        //         builder: (context) => const UpdateProfileScreen()));
       },
       child: Row(
         children: [

@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:task_manager/data/models/response_object.dart';
+import 'package:task_manager/data/services/network_caller.dart';
+import 'package:task_manager/data/utility/urls.dart';
 import 'package:task_manager/presentation/screens/auth/email_verification_screen.dart';
 import 'package:task_manager/presentation/screens/main_bottom_nav_screen.dart';
 import 'package:task_manager/presentation/screens/auth/sign_up_screen.dart';
 import 'package:task_manager/presentation/widgets/background_widget.dart';
+import 'package:task_manager/presentation/widgets/snack_bar_message.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
+
+  static const String routeName = 'sign_in_screen';
 
   @override
   State<SignInScreen> createState() => _SignInScreenState();
@@ -15,6 +21,8 @@ class _SignInScreenState extends State<SignInScreen> {
   final TextEditingController _emailTEController = TextEditingController();
   final TextEditingController _passwordTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _isSignInProgress = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,6 +49,12 @@ class _SignInScreenState extends State<SignInScreen> {
                     decoration: const InputDecoration(
                       hintText: "Email",
                     ),
+                    validator: (String? value) {
+                      if (value?.trim().isEmpty ?? true) {
+                        return "Enter Your Email";
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 8),
                   TextFormField(
@@ -49,20 +63,29 @@ class _SignInScreenState extends State<SignInScreen> {
                     decoration: const InputDecoration(
                       hintText: "Password",
                     ),
+                    validator: (String? value) {
+                      if (value?.trim().isEmpty ?? true) {
+                        return "Enter Your Password";
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const MainBottomNavScreen()),
-                            (route) => false);
-                      },
-                      child: const Icon(Icons.arrow_circle_right_outlined),
+                    child: Visibility(
+                      visible: _isSignInProgress == false,
+                      replacement: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if(_formKey.currentState!.validate()){
+                            _signIn();
+                          }
+                        },
+                        child: const Icon(Icons.arrow_circle_right_outlined),
+                      ),
                     ),
                   ),
                   const SizedBox(
@@ -114,6 +137,36 @@ class _SignInScreenState extends State<SignInScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _signIn() async {
+    _isSignInProgress = true;
+    setState(() {});
+
+    Map<String, dynamic> inputParams = {
+      'email' : _emailTEController.text.trim(),
+      'password' : _passwordTEController.text,
+    };
+    final ResponseObject response = await NetworkCaller.postRequest(Urls.login, inputParams);
+
+    _isSignInProgress = false;
+    setState(() {});
+
+    if(response.isSuccess){
+      if(!mounted){
+        return;
+      }
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+              const MainBottomNavScreen()),
+              (route) => false);
+    } else {
+      if(mounted){
+        showSnackBarMessage(context, response.errorMessage ?? 'Login Failed, try again');
+      }
+    }
   }
 
   @override
