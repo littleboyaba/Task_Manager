@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:task_manager/presentation/screens/set_password_screen.dart';
-import 'package:task_manager/presentation/screens/sign_in_screen.dart';
+import 'package:task_manager/presentation/screens/auth/set_password_screen.dart';
+import 'package:task_manager/presentation/screens/auth/sign_in_screen.dart';
 import 'package:task_manager/presentation/utils/app_colors.dart';
 import 'package:task_manager/presentation/widgets/background_widget.dart';
 
