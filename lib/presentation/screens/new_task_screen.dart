@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:task_manager/presentation/screens/add_new_task_screen.dart';
+import 'package:task_manager/presentation/utils/app_colors.dart';
 import 'package:task_manager/presentation/widgets/background_widget.dart';
-import '../widgets/profile_bar.dart';
+import '../widgets/profile_app_bar.dart';
 import '../widgets/task_card.dart';
 import '../widgets/task_counter_card.dart';
 
@@ -22,7 +24,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
             taskCounterSection,
             Expanded(
               child: ListView.builder(
-                  itemCount: 5,
+                  itemCount: 6,
                   itemBuilder: (context, index) {
                     return const TaskCard();
                   }),
@@ -31,14 +33,22 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add,),
-        onPressed: (){},),
+        backgroundColor: AppColors.themeColor,
+        child: const Icon(Icons.add, color: Colors.white),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AddNewTaskScreen()),
+          );
+        },
+      ),
     );
   }
 
   Widget get taskCounterSection {
     return SizedBox(
-      height: 120,
+      height: 130,
+      width: double.infinity,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView.separated(
@@ -51,14 +61,10 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
             );
           },
           separatorBuilder: (_, __) {
-            return const SizedBox(
-              width: 8,
-            );
+            return const SizedBox(width: 40);
           },
         ),
       ),
     );
   }
 }
-
-
