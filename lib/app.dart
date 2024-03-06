@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:task_manager/presentation/screens/auth/sign_in_screen.dart';
 import 'package:task_manager/presentation/screens/splash_screen.dart';
 import 'package:task_manager/presentation/utils/app_colors.dart';
-import 'package:task_manager/presentation/utils/app_routes.dart';
 
 class TaskManager extends StatefulWidget {
   const TaskManager({super.key});
@@ -62,8 +60,6 @@ class _TaskManagerState extends State<TaskManager> {
           borderRadius: BorderRadius.circular(50),
         )),
       ),
-      initialRoute: SignInScreen.routeName, // Specify the initial route
-      onGenerateRoute: AppRoutes.generateRoute, // Use the generateRoute method
     );
   }
 }

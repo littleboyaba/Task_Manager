@@ -11,8 +11,6 @@ import 'package:task_manager/presentation/widgets/snack_bar_message.dart';
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
 
-  static const String routeName = 'sign_in_screen';
-
   @override
   State<SignInScreen> createState() => _SignInScreenState();
 }

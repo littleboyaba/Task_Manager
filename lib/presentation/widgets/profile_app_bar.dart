@@ -10,16 +10,12 @@ PreferredSizeWidget get profileAppBar {
     automaticallyImplyLeading: false,
     title: GestureDetector(
       onTap: () {
-        if (ModalRoute.of(TaskManager.navigatorKey.currentState!.context)?.settings.name != UpdateProfileScreen.routeName) {
-          Navigator.pushNamed(
-            TaskManager.navigatorKey.currentState!.context,
-            UpdateProfileScreen.routeName,
-          );
-        }
-        // Navigator.push(
-        //     TaskManager.navigatorKey.currentState!.context,
-        //     MaterialPageRoute(
-        //         builder: (context) => const UpdateProfileScreen()));
+        Navigator.push(
+          TaskManager.navigatorKey.currentState!.context,
+          MaterialPageRoute(
+            builder: (context) => const UpdateProfileScreen(),
+          ),
+        );
       },
       child: Row(
         children: [
@@ -31,11 +27,13 @@ PreferredSizeWidget get profileAppBar {
               children: [
                 Text("Rabbil Hasan",
                     style: TextStyle(fontSize: 16, color: Colors.white)),
-                Text("info@rabbilhasan.com",
-                    style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w400)),
+                Text(
+                  "info@rabbilhasan.com",
+                  style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w400),
+                ),
               ],
             ),
           ),
@@ -43,7 +41,8 @@ PreferredSizeWidget get profileAppBar {
               onPressed: () {
                 Navigator.pushAndRemoveUntil(
                     TaskManager.navigatorKey.currentState!.context,
-                    MaterialPageRoute(builder: (context) => const SignInScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => const SignInScreen()),
                     (route) => false);
               },
               icon: const Icon(Icons.logout)),
