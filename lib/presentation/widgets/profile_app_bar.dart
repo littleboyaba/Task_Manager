@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:task_manager/app.dart';
+import 'package:task_manager/presentation/controller/auth_controller.dart';
 import 'package:task_manager/presentation/screens/auth/sign_in_screen.dart';
 import 'package:task_manager/presentation/screens/update_profile_screen.dart';
 import '../utils/app_colors.dart';
@@ -38,12 +39,13 @@ PreferredSizeWidget get profileAppBar {
             ),
           ),
           IconButton(
-              onPressed: () {
-                Navigator.pushAndRemoveUntil(
-                    TaskManager.navigatorKey.currentState!.context,
-                    MaterialPageRoute(
-                        builder: (context) => const SignInScreen()),
-                    (route) => false);
+              onPressed: () async {
+                await AuthController.clearUserData();
+                  Navigator.pushAndRemoveUntil(
+                      TaskManager.navigatorKey.currentState!.context,
+                      MaterialPageRoute(
+                          builder: (context) => const SignInScreen()),
+                          (route) => false);
               },
               icon: const Icon(Icons.logout)),
         ],

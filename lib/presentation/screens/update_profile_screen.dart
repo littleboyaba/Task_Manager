@@ -5,8 +5,6 @@ import 'package:task_manager/presentation/widgets/profile_app_bar.dart';
 class UpdateProfileScreen extends StatefulWidget {
   const UpdateProfileScreen({super.key});
 
-  static const String routeName = 'update_profile_screen';
-
   @override
   State<UpdateProfileScreen> createState() => _UpdateProfileScreenState();
 }
