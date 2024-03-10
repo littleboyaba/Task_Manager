@@ -25,7 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _moveToNextScreen() async {
     await Future.delayed(const Duration(seconds: 2));
 
-    bool loginState = await AuthController.isUserLogin();
+    bool loginState = await AuthController.isUserLoggedIn();
 
     if (mounted) {
       if (loginState) {

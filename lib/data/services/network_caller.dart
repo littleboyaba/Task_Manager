@@ -3,11 +3,13 @@ import 'dart:developer';
 
 import 'package:http/http.dart';
 import 'package:task_manager/data/models/response_object.dart';
+import 'package:task_manager/presentation/controller/auth_controller.dart';
 
 class NetworkCaller {
   static Future<ResponseObject> getRequest(String url) async {
     try {
-      final Response response = await get(Uri.parse(url));
+      final Response response = await get(Uri.parse(url),
+          headers: {'token': AuthController.accessToken ?? ''});
 
       log(response.statusCode.toString());
       log(response.body.toString());
@@ -39,7 +41,10 @@ class NetworkCaller {
       log(body.toString());
       final Response response = await post(Uri.parse(url),
           body: jsonEncode(body),
-          headers: {'content-type': 'application/json'});
+          headers: {
+            'content-type': 'application/json',
+            'token': AuthController.accessToken ?? ''
+          });
 
       log(response.statusCode.toString());
       log(response.body.toString());
@@ -48,18 +53,18 @@ class NetworkCaller {
         final decodedResponse = jsonDecode(response.body);
         return ResponseObject(
             isSuccess: true, statusCode: 200, responseBody: decodedResponse);
-      } else if(response.statusCode == 401){
+      } else if (response.statusCode == 401) {
         return ResponseObject(
-            isSuccess: false,
-            statusCode: response.statusCode,
-            responseBody: '',
-            errorMessage: 'Email/Password incorrect try again',
+          isSuccess: false,
+          statusCode: response.statusCode,
+          responseBody: '',
+          errorMessage: 'Email/Password incorrect try again',
         );
       } else {
         return ResponseObject(
-            isSuccess: false,
-            statusCode: response.statusCode,
-            responseBody: '',
+          isSuccess: false,
+          statusCode: response.statusCode,
+          responseBody: '',
         );
       }
     } catch (e) {
