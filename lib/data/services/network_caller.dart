@@ -8,6 +8,8 @@ import 'package:task_manager/presentation/controller/auth_controller.dart';
 class NetworkCaller {
   static Future<ResponseObject> getRequest(String url) async {
     try {
+      log(url);
+      log(AuthController.accessToken.toString());
       final Response response = await get(Uri.parse(url),
           headers: {'token': AuthController.accessToken ?? ''});
 
