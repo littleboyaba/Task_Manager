@@ -21,6 +21,7 @@ class NewTaskScreen extends StatefulWidget {
 class _NewTaskScreenState extends State<NewTaskScreen> {
   bool _getAllTaskCountByStatusInProgress = false;
   bool _getNewTaskListInProgress = false;
+  bool _deleteTaskInProgress = false;
   CountByStatusWrapper _countByStatusWrapper = CountByStatusWrapper();
   TaskListWrapper _newTaskListWrapper = TaskListWrapper();
 
@@ -50,7 +51,8 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                 child: taskCounterSection),
             Expanded(
               child: Visibility(
-                visible: _getNewTaskListInProgress == false,
+                visible: _getNewTaskListInProgress == false &&
+                    _deleteTaskInProgress == false,
                 replacement: const Center(
                   child: CircularProgressIndicator(),
                 ),
@@ -61,6 +63,10 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                       itemBuilder: (context, index) {
                         return TaskCard(
                           taskItem: _newTaskListWrapper.taskList![index],
+                          onDelete: () {
+                            _deleteTaskById(
+                                _newTaskListWrapper.taskList![index].sId!);
+                          },
                         );
                       }),
                 ),
@@ -70,14 +76,21 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          // Todo: Recall the home apis after successfully add new task/tasks
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const AddNewTaskScreen(),
+            ),
+          );
+          if (result != null && result == true) {
+            // If successful, recall the home APIs
+            _getDataFromApis();
+          }
+        },
         backgroundColor: AppColors.themeColor,
         child: const Icon(Icons.add, color: Colors.white),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AddNewTaskScreen()),
-          );
-        },
       ),
     );
   }
@@ -141,6 +154,24 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
       if (mounted) {
         showSnackBarMessage(context,
             response.errorMessage ?? 'Get new task list has been failed');
+      }
+    }
+  }
+
+  Future<void> _deleteTaskById(String id) async {
+    _deleteTaskInProgress = true;
+    setState(() {});
+
+    final response = await NetworkCaller.getRequest(Urls.deleteTask(id));
+    _deleteTaskInProgress = false;
+
+    if (response.isSuccess) {
+      _getDataFromApis();
+    } else {
+      setState(() {});
+      if (mounted) {
+        showSnackBarMessage(
+            context, response.errorMessage ?? 'Delete task has been failed');
       }
     }
   }
