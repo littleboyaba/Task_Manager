@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:task_manager/data/models/task_item.dart';
 import 'package:task_manager/presentation/widgets/snack_bar_message.dart';
@@ -48,9 +47,10 @@ class _TaskCardState extends State<TaskCard> {
                   visible: _updateTaskStatusInProgress == false,
                   replacement: const CircularProgressIndicator(),
                   child: IconButton(
-                      onPressed: (){
+                      onPressed: () {
                         _showUpdateStatusDialog(widget.taskItem.sId!);
-                      }, icon: const Icon(Icons.edit)),
+                      },
+                      icon: const Icon(Icons.edit)),
                 ),
                 Visibility(
                   visible: _deleteTaskInProgress == false,
@@ -78,27 +78,53 @@ class _TaskCardState extends State<TaskCard> {
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const ListTile(
-                  title: Text('New'),
-                  trailing: Icon(Icons.check),
+                ListTile(
+                  title: const Text('New'),
+                  trailing:
+                      _isCurrentStatus('New') ? const Icon(Icons.check) : null,
+                  onTap: () {
+                    if (_isCurrentStatus('New')) {
+                      return;
+                    }
+                    _updateTaskById(id, 'New');
+                    Navigator.pop(context);
+                  },
                 ),
                 ListTile(
                   title: const Text('Completed'),
+                  trailing: _isCurrentStatus('Completed')
+                      ? const Icon(Icons.check)
+                      : null,
                   onTap: () {
+                    if (_isCurrentStatus('Completed')) {
+                      return;
+                    }
                     _updateTaskById(id, 'Completed');
                     Navigator.pop(context);
                   },
                 ),
                 ListTile(
                   title: const Text('Canceled'),
+                  trailing: _isCurrentStatus('Canceled')
+                      ? const Icon(Icons.check)
+                      : null,
                   onTap: () {
+                    if (_isCurrentStatus('Canceled')) {
+                      return;
+                    }
                     _updateTaskById(id, 'Canceled');
                     Navigator.pop(context);
                   },
                 ),
                 ListTile(
                   title: const Text('Progress'),
+                  trailing: _isCurrentStatus('Progress')
+                      ? const Icon(Icons.check)
+                      : null,
                   onTap: () {
+                    if (_isCurrentStatus('Progress')) {
+                      return;
+                    }
                     _updateTaskById(id, 'Progress');
                     Navigator.pop(context);
                   },
@@ -107,14 +133,17 @@ class _TaskCardState extends State<TaskCard> {
             ),
           );
         });
+  }
 
+  bool _isCurrentStatus(String status) {
+    return widget.taskItem.status! == status;
   }
 
   Future<void> _updateTaskById(String id, String status) async {
     _updateTaskStatusInProgress = true;
     setState(() {});
     final response =
-    await NetworkCaller.getRequest(Urls.updateTaskStatus(id, status));
+        await NetworkCaller.getRequest(Urls.updateTaskStatus(id, status));
     _updateTaskStatusInProgress = false;
     if (response.isSuccess) {
       _updateTaskStatusInProgress = false;
@@ -127,6 +156,7 @@ class _TaskCardState extends State<TaskCard> {
       }
     }
   }
+
   Future<void> _deleteTaskById(String id) async {
     _deleteTaskInProgress = true;
     setState(() {});
@@ -144,5 +174,4 @@ class _TaskCardState extends State<TaskCard> {
       }
     }
   }
-
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:task_manager/data/models/task_list_wrapper.dart';
 import 'package:task_manager/presentation/widgets/background_widget.dart';
+import 'package:task_manager/presentation/widgets/empty_list_widget.dart';
 import '../../data/services/network_caller.dart';
 import '../../data/utility/urls.dart';
 import '../widgets/profile_app_bar.dart';
@@ -34,16 +35,26 @@ class _CompleteTaskScreenState extends State<CompleteTaskScreen> {
           replacement: const Center(
             child: CircularProgressIndicator(),
           ),
-          child: ListView.builder(
-              itemCount: _completedTaskListWrapper.taskList?.length ?? 0,
-              itemBuilder: (context, index) {
-                return TaskCard(
-                  taskItem: _completedTaskListWrapper.taskList![index],
-                  refreshList: () {
-                    _getAllCompletedTaskList();
-                  },
-                );
-              }),
+          /// Todo: Make it work
+          child: RefreshIndicator(
+            onRefresh: () async {
+              _getAllCompletedTaskList();
+            },
+            child: Visibility(
+              visible: _completedTaskListWrapper.taskList?.isNotEmpty ?? false,
+              replacement: const EmptyListWidget(),
+              child: ListView.builder(
+                  itemCount: _completedTaskListWrapper.taskList?.length ?? 0,
+                  itemBuilder: (context, index) {
+                    return TaskCard(
+                      taskItem: _completedTaskListWrapper.taskList![index],
+                      refreshList: () {
+                        _getAllCompletedTaskList();
+                      },
+                    );
+                  }),
+            ),
+          ),
         ),
       ),
     );

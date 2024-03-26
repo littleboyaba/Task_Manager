@@ -7,6 +7,7 @@ import 'package:task_manager/presentation/screens/add_new_task_screen.dart';
 import 'package:task_manager/presentation/utils/app_colors.dart';
 import 'package:task_manager/presentation/widgets/background_widget.dart';
 import 'package:task_manager/presentation/widgets/snack_bar_message.dart';
+import '../widgets/empty_list_widget.dart';
 import '../widgets/profile_app_bar.dart';
 import '../widgets/task_card.dart';
 import '../widgets/task_counter_card.dart';
@@ -56,16 +57,20 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                 ),
                 child: RefreshIndicator(
                   onRefresh: () async => _getDataFromApis(),
-                  child: ListView.builder(
-                      itemCount: _newTaskListWrapper.taskList?.length ?? 0,
-                      itemBuilder: (context, index) {
-                        return TaskCard(
-                          taskItem: _newTaskListWrapper.taskList![index],
-                          refreshList: () {
-                            _getDataFromApis();
-                        },
-                        );
-                      }),
+                  child: Visibility(
+                    visible: _newTaskListWrapper.taskList?.isNotEmpty ?? false,
+                    replacement: const EmptyListWidget(),
+                    child: ListView.builder(
+                        itemCount: _newTaskListWrapper.taskList?.length ?? 0,
+                        itemBuilder: (context, index) {
+                          return TaskCard(
+                            taskItem: _newTaskListWrapper.taskList![index],
+                            refreshList: () {
+                              _getDataFromApis();
+                            },
+                          );
+                        }),
+                  ),
                 ),
               ),
             ),
@@ -74,7 +79,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          // Todo: Recall the home apis after successfully add new task/tasks
+          /// Todo: Recall the home apis after successfully add new task/tasks
           final result = await Navigator.push(
             context,
             MaterialPageRoute(
@@ -155,3 +160,5 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
     }
   }
 }
+
+
