@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
 import 'package:task_manager/presentation/screens/auth/pin_verification_screen.dart';
 import 'package:task_manager/presentation/widgets/background_widget.dart';
@@ -22,7 +20,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       body: BackgroundWidget(
         child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.all(24),
+            padding: const EdgeInsets.all(24),
             child: Form(
               key: _formKey,
               child: Column(
@@ -36,7 +34,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                   const SizedBox(
                     height: 4,
                   ),
-                  Text(
+                  const Text(
                     "A 6 digit verification pin will send to your email address",
                     style: TextStyle(
                       fontSize: 15,
@@ -49,7 +47,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                   TextFormField(
                     controller: _emailTEController,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: "Email",
                     ),
                   ),
@@ -65,7 +63,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                                   const PinVerificationScreen()),
                         );
                       },
-                      child: Icon(Icons.arrow_circle_right_outlined),
+                      child: const Icon(Icons.arrow_circle_right_outlined),
                     ),
                   ),
                   const SizedBox(
@@ -74,7 +72,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
+                      const Text(
                         "Have Account?",
                         style: TextStyle(fontSize: 16, color: Colors.black54),
                       ),

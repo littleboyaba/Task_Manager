@@ -1,10 +1,16 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:task_manager/data/models/user_data.dart';
+import 'package:task_manager/data/services/network_caller.dart';
+import 'package:task_manager/data/utility/urls.dart';
 import 'package:task_manager/presentation/controller/auth_controller.dart';
+import 'package:task_manager/presentation/screens/main_bottom_nav_screen.dart';
 import 'package:task_manager/presentation/widgets/background_widget.dart';
 import 'package:task_manager/presentation/widgets/profile_app_bar.dart';
+import 'package:task_manager/presentation/widgets/snack_bar_message.dart';
 
 class UpdateProfileScreen extends StatefulWidget {
   const UpdateProfileScreen({super.key});
@@ -101,6 +107,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       }
                       return null;
                     },
+                    maxLength: 11,
                   ),
                   const SizedBox(height: 8),
                   TextFormField(
@@ -108,26 +115,23 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                     decoration: const InputDecoration(
                       hintText: "Password (Optional)",
                     ),
-                    /* validator: (String? value){
-                      if(value?.trim().isEmpty ?? true){
-                        return "Enter your Password";
-                      }
-                      if(value!.length <= 6){
-                        return "Password must be more than 6 letters";
-                      }
-                      return null;
-                    }, */
                   ),
                   const SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          Navigator.pop(context);
-                        }
-                      },
-                      child: const Icon(Icons.arrow_circle_right_outlined),
+                    child: Visibility(
+                      visible: _updateProfileInProgress == false,
+                      replacement: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            _updateProfile();
+                          }
+                        },
+                        child: const Icon(Icons.arrow_circle_right_outlined),
+                      ),
                     ),
                   ),
                 ],
@@ -190,10 +194,55 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     setState(() {});
   }
 
-  Future<void> _updateProfile() async{
+  Future<void> _updateProfile() async {
+    String? photo;
+
     _updateProfileInProgress = true;
     setState(() {});
 
+    Map<String, dynamic> inputParams = {
+      "email": _emailTEController.text,
+      "firstName": _firstNameTEController.text.trim(),
+      "lastName": _lastNameTEController.text.trim(),
+      "mobile": _mobileTEController.text.trim(),
+    };
+    if (_passwordTEController.text.isNotEmpty) {
+      inputParams['password'] = _passwordTEController.text;
+    }
+
+    if (_pickedImage != null) {
+      List<int> bytes = File(_pickedImage!.path).readAsBytesSync();
+      photo = base64Encode(bytes);
+      inputParams['photo'] = photo;
+    }
+    final response =
+        await NetworkCaller.postRequest(Urls.updateProfile, inputParams);
+    _updateProfileInProgress = false;
+    if (response.isSuccess) {
+      if (response.responseBody['status'] == 'success') {
+        UserData userData = UserData(
+          email: _emailTEController.text,
+          firstName: _firstNameTEController.text.trim(),
+          lastName: _lastNameTEController.text.trim(),
+          mobile: _mobileTEController.text.trim(),
+          photo: photo,
+        );
+        await AuthController.saveUserData(userData);
+      }
+      if (mounted) {
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const MainBottomNavScreen()),
+            (route) => false);
+      }
+    } else {
+      if (!mounted) {
+        return;
+      }
+      setState(() {});
+      showSnackBarMessage(context, 'Update profile has been failed');
+    }
   }
 
   @override
