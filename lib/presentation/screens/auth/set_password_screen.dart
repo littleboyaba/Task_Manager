@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:task_manager/data/services/network_caller.dart';
+import 'package:task_manager/data/utility/urls.dart';
 import 'package:task_manager/presentation/screens/auth/sign_in_screen.dart';
 import 'package:task_manager/presentation/widgets/background_widget.dart';
 
+import '../../widgets/snack_bar_message.dart';
+
 class SetPasswordScreen extends StatefulWidget {
-  const SetPasswordScreen({super.key});
+  const SetPasswordScreen({super.key, required this.email, required this.otp});
+
+  final String email;
+  final String otp;
 
   @override
   State<SetPasswordScreen> createState() => _SetPasswordScreenState();
@@ -12,8 +19,10 @@ class SetPasswordScreen extends StatefulWidget {
 class _SetPasswordScreenState extends State<SetPasswordScreen> {
   final TextEditingController _passwordTEController = TextEditingController();
   final TextEditingController _confirmPasswordTEController =
-      TextEditingController();
+  TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _isSetPasswordInProgress = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,7 +38,10 @@ class _SetPasswordScreenState extends State<SetPasswordScreen> {
                   const SizedBox(height: 100),
                   Text(
                     "Set Password",
-                    style: Theme.of(context).textTheme.titleLarge,
+                    style: Theme
+                        .of(context)
+                        .textTheme
+                        .titleLarge,
                   ),
                   const SizedBox(height: 4),
                   const Text(
@@ -46,6 +58,15 @@ class _SetPasswordScreenState extends State<SetPasswordScreen> {
                     decoration: const InputDecoration(
                       hintText: "Password",
                     ),
+                    validator: (String? value) {
+                      if (value?.trim().isEmpty ?? true) {
+                        return "Enter Your Password";
+                      }
+                      if (value!.length <= 8) {
+                        return 'Password should more than 8 letters.';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 8),
                   TextFormField(
@@ -54,13 +75,28 @@ class _SetPasswordScreenState extends State<SetPasswordScreen> {
                     decoration: const InputDecoration(
                       hintText: "Confirm Password",
                     ),
+                    validator: (String? value) {
+                      if (value?.trim().isEmpty ?? true) {
+                        return "Enter Your Password";
+                      }
+                      if (value!.length <= 8) {
+                        return 'Password should more than 8 letters.';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      child: const Text("Confirm"),
+                    child: Visibility(
+                      visible: _isSetPasswordInProgress == false,
+                      replacement: const Center(child: CircularProgressIndicator(),),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          _resetPasswordApi();
+                        },
+                        child: const Text("Confirm"),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 32),
@@ -77,7 +113,7 @@ class _SetPasswordScreenState extends State<SetPasswordScreen> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => const SignInScreen()),
-                              (route) => false);
+                                  (route) => false);
                         },
                         child: const Text("Sign In"),
                       ),
@@ -92,10 +128,30 @@ class _SetPasswordScreenState extends State<SetPasswordScreen> {
     );
   }
 
-  @override
-  void dispose() {
-    _passwordTEController.dispose();
-    _confirmPasswordTEController.dispose();
-    super.dispose();
+  Future<void> _resetPasswordApi() async {
+    _isSetPasswordInProgress = true;
+    setState(() {});
+    Map<String, dynamic> inputParams = {
+      'email': widget.email,
+      'OTP': widget.otp,
+      'password': _passwordTEController.text,
+    };
+    final response = await NetworkCaller.postRequest(
+        Urls.recoveryPasswordReset, inputParams);
+    _isSetPasswordInProgress = false;
+    if (response.isSuccess) {
+      setState(() {});
+      if (!mounted) {
+        return;
+      }
+      Navigator.pushAndRemoveUntil(context,
+          MaterialPageRoute(builder: (context) => const SignInScreen()), (
+              route) => false);
+    } else {
+      setState(() {});
+      if (mounted) {
+        showSnackBarMessage(context, "Invalid password", true);
+      }
+    }
   }
 }

@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:task_manager/data/services/network_caller.dart';
+import 'package:task_manager/data/utility/urls.dart';
 import 'package:task_manager/presentation/screens/auth/set_password_screen.dart';
 import 'package:task_manager/presentation/screens/auth/sign_in_screen.dart';
 import 'package:task_manager/presentation/utils/app_colors.dart';
 import 'package:task_manager/presentation/widgets/background_widget.dart';
 
+import '../../widgets/snack_bar_message.dart';
+
 class PinVerificationScreen extends StatefulWidget {
-  const PinVerificationScreen({super.key});
+  const PinVerificationScreen({super.key, required this.email});
+
+  final String email;
 
   @override
   State<PinVerificationScreen> createState() => _PinVerificationScreenState();
@@ -15,6 +21,7 @@ class PinVerificationScreen extends StatefulWidget {
 class _PinVerificationScreenState extends State<PinVerificationScreen> {
   final TextEditingController _pinTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _isPinVerificationInProgress = false;
 
   @override
   Widget build(BuildContext context) {
@@ -63,22 +70,30 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
                     animationDuration: const Duration(milliseconds: 300),
                     backgroundColor: Colors.transparent,
                     enableActiveFill: true,
-                    onCompleted: (v) {},
+                    onCompleted: (v) {                    },
                     onChanged: (value) {},
                     appContext: context,
+                    validator: (String? value){
+                      if(value!.isEmpty){
+                        return 'Please enter OTP';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const SetPasswordScreen()),
-                        );
-                      },
-                      child: const Text("Verify"),
+                    child: Visibility(
+                      visible: _isPinVerificationInProgress == false,
+                      replacement: const Center(child: CircularProgressIndicator(),),
+                      child: ElevatedButton(
+                        onPressed: () {
+                         if(_formKey.currentState!.validate()){
+                           _receiveVerificationOtp();
+                         }
+                        },
+                        child: const Text("Verify"),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 32),
@@ -108,6 +123,27 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
         ),
       ),
     );
+  }
+  
+  Future<void> _receiveVerificationOtp() async {
+    setState(() {
+      _isPinVerificationInProgress = true;
+    });
+    
+    final response = await NetworkCaller.getRequest(Urls.receivedEmailOtp(widget.email, _pinTEController.text));
+    _isPinVerificationInProgress = false;
+    setState(() {});
+    if(response.isSuccess){
+      if(response.responseBody['status'] == 'success'){
+        if(mounted){
+          Navigator.push(context, MaterialPageRoute(builder: (context) => SetPasswordScreen(email: widget.email, otp: _pinTEController.text )));
+        }
+      }
+    }else{
+      if (mounted) {
+        showSnackBarMessage(context, "Wrong OTP");
+      }
+    }
   }
 
   @override
