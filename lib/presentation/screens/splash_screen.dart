@@ -1,6 +1,5 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:task_manager/presentation/controller/auth_controller.dart';
 import 'package:task_manager/presentation/screens/auth/sign_in_screen.dart';
 import 'package:task_manager/presentation/screens/main_bottom_nav_screen.dart';
@@ -29,26 +28,16 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (mounted) {
       if (loginState) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const MainBottomNavScreen(),
-          ),
-        );
+        Get.offAll(() => const MainBottomNavScreen());
       } else {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const SignInScreen(),
-          ),
-        );
+        Get.offAll(() => const SignInScreen());
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: BackgroundWidget(
         child: Center(
           child: AppLogo(),

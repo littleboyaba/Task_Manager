@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:task_manager/data/models/task_item.dart';
 import 'package:task_manager/presentation/widgets/snack_bar_message.dart';
 
@@ -87,7 +88,7 @@ class _TaskCardState extends State<TaskCard> {
                       return;
                     }
                     _updateTaskById(id, 'New');
-                    Navigator.pop(context);
+                    Get.back();
                   },
                 ),
                 ListTile(
@@ -100,7 +101,7 @@ class _TaskCardState extends State<TaskCard> {
                       return;
                     }
                     _updateTaskById(id, 'Completed');
-                    Navigator.pop(context);
+                    Get.back();
                   },
                 ),
                 ListTile(
@@ -113,7 +114,7 @@ class _TaskCardState extends State<TaskCard> {
                       return;
                     }
                     _updateTaskById(id, 'Canceled');
-                    Navigator.pop(context);
+                    Get.back();
                   },
                 ),
                 ListTile(
@@ -126,7 +127,7 @@ class _TaskCardState extends State<TaskCard> {
                       return;
                     }
                     _updateTaskById(id, 'Progress');
-                    Navigator.pop(context);
+                    Get.back();
                   },
                 ),
               ],
